@@ -3,7 +3,7 @@ module.exports = {
   siteMetadata: {
     siteTitle: 'Good things never last.',
     siteUrl: 'https://github.com/allenforrest/running_page',
-    logo: 'http://desktopdn.akeychat.cn/allen/photo_2015-04-07_15-36-13.jpg',
+    logo: 'https://raw.githubusercontent.com/allenforrest/box/master/image/jpeg/photo_2015-04-07_15-36-13.jpg',
     description: 'My running page repo',
     navLinks: [
       {
