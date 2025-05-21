@@ -15,6 +15,7 @@ import s2sphere as s2
 
 from .exceptions import TrackLoadError
 from .utils import parse_datetime_to_local
+from dateutil import parser as dateutil_parser
 
 start_point = namedtuple("start_point", "lat lon")
 run_map = namedtuple("polyline", "summary_polyline")
@@ -55,9 +56,10 @@ class Track:
     def load_from_db(self, activity):
         # use strava as file name
         self.file_names = [str(activity.run_id)]
-        start_time = datetime.datetime.strptime(
-            activity.start_date_local, "%Y-%m-%d %H:%M:%S"
-        )
+        # start_time = datetime.datetime.strptime(
+        #     activity.start_date_local, "%Y-%m-%d %H:%M:%S"
+        # )
+        start_time = dateutil_parser.parse(activity.start_date_local).date()
         self.start_time_local = start_time
         self.end_time = start_time + activity.elapsed_time
         self.length = float(activity.distance)
@@ -146,18 +148,22 @@ class Track:
         try:
             with open(cache_file_name) as data_file:
                 data = json.load(data_file)
-                self.start_time = datetime.datetime.strptime(
-                    data["start"], "%Y-%m-%d %H:%M:%S"
-                )
-                self.end_time = datetime.datetime.strptime(
-                    data["end"], "%Y-%m-%d %H:%M:%S"
-                )
-                self.start_time_local = datetime.datetime.strptime(
-                    data["start_local"], "%Y-%m-%d %H:%M:%S"
-                )
-                self.end_time_local = datetime.datetime.strptime(
-                    data["end_local"], "%Y-%m-%d %H:%M:%S"
-                )
+                # self.start_time = datetime.datetime.strptime(
+                #     data["start"], "%Y-%m-%d %H:%M:%S"
+                # )
+                self.start_time = dateutil_parser.parse(data["start"])
+                self.end_time = dateutil_parser.parse(data["end"])
+                # self.end_time = datetime.datetime.strptime(
+                #     data["end"], "%Y-%m-%d %H:%M:%S"
+                # )
+                self.start_time_local = dateutil_parser.parse(data["start_local"])
+                # self.start_time_local = datetime.datetime.strptime(
+                #     data["start_local"], "%Y-%m-%d %H:%M:%S"
+                # )
+                # self.end_time_local = datetime.datetime.strptime(
+                #     data["end_local"], "%Y-%m-%d %H:%M:%S"
+                # )
+                self.end_time_local = dateutil_parser.parse(data["end_local"])
                 self.length = float(data["length"])
                 self.polylines = []
                 for data_line in data["segments"]:
