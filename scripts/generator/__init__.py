@@ -5,6 +5,7 @@ import arrow
 import stravalib
 from gpxtrackposter import track_loader
 from sqlalchemy import func
+from dateutil import parser as dateutil_parser
 
 from .db import Activity, init_db, update_or_create_activity
 
@@ -106,9 +107,7 @@ class Generator:
         for activity in activities:
             # Determine running streak.
             if activity.type == "Run":
-                date = datetime.datetime.strptime(
-                    activity.start_date_local, "%Y-%m-%d %H:%M:%S"
-                ).date()
+                date = dateutil_parser.parse(activity.start_date_local).date()
                 if last_date is None:
                     streak = 1
                 elif date == last_date:
