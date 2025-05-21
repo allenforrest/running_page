@@ -4,6 +4,7 @@ import string
 import time
 from datetime import timedelta
 
+import geopy
 from geopy.geocoders import Nominatim
 from sqlalchemy import Column, Float, Integer, Interval, String, create_engine, inspect, text
 from sqlalchemy.ext.declarative import declarative_base
@@ -18,12 +19,15 @@ import string
 # random user name 8 letters
 def randomword():
     letters = string.ascii_lowercase
-    return "".join(random.choice(letters) for i in range(8))
+    word = "".join(random.choice(letters) for i in range(8))
+    print(word)
+    return word
 
 
 # reverse the location (lan, lon) -> location detail
+geopy.geocoders.options.default_user_agent = "my-application"
+geopy.geocoders.options.default_timeout = 30
 g = Nominatim(user_agent=randomword())
-
 
 ACTIVITY_KEYS = [
     "run_id",
@@ -106,17 +110,20 @@ def update_or_create_activity(session, run_activity):
             if not location_country and start_point or location_country == "China":
                 try:
                     location_country = str(
-                        g.reverse(f"{start_point.lat}, {start_point.lon}")
+                        g.reverse(
+                            f"{start_point.lat}, {start_point.lon}", language="zh-CN"
+                        )
                     )
                 # limit (only for the first time)
-                except:
-                    print("+++++++limit+++++++")
-                    time.sleep(2)
+                except Exception:
                     try:
                         location_country = str(
-                            g.reverse(f"{start_point.lat}, {start_point.lon}")
+                            g.reverse(
+                                f"{start_point.lat}, {start_point.lon}",
+                                language="zh-CN",
+                            )
                         )
-                    except:
+                    except Exception:
                         pass
 
             activity = Activity(
